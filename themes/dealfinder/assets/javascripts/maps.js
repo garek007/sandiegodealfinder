@@ -8,37 +8,7 @@ var map;
 var item = new Object();
 if (navigator.geolocation) {
   //we'll use this to call a function and get position if geolocation works
-  navigator.geolocation.getCurrentPosition(function(position){
-    var lat = position.coords.latitude;
-    var lng = position.coords.longitude;
-    //We use open street map.org here because Google's JSON is a mess. We'll switch back to Google when they wisen up
-    var googleLookup = "http://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng+"&sensor=true";
-    var openStreetMapLookup = "http://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon="+lng;
-
-    $.getJSON( openStreetMapLookup , function( data ) {
-      //find zipcode in JSON response
-      var userZipcode = data.address.postcode;
-      //var nearbyVenuesURL = "/venues";
-      var d = new Date();
-      var today = d.getDay();
-      $.ajax({
-        method: "POST",
-        url: "/venues",
-        data: {
-          userZipcode: userZipcode,
-          userLat: lat,
-          userLng: lng,
-          radius: 1.5,
-          day: today
-        }
-      }).done(function(data) {
-        initialize(lat,lng,$.parseJSON(data));
-        console.log(data);
-      });
-
-
-    });
-  }, error);
+  navigator.geolocation.getCurrentPosition(updateMap, error);
 
 
 } else {
@@ -163,19 +133,60 @@ $("#radius").slider({
 function updateSlider(){
   $("#radius_value").text( $("#radius").slider("value")+" miles" );
 }
-var d = new Date();
-setPageDate(d);
+
 $("#day_of_week").change(updateMap);
-function updateMap(){
-  //really this needs to refire the primary ajax call to run new queries for tomorrow
-  //we don't actually have to pull all the venues again, but we might to make it easier
+function updateMap(position){
+  var today = this.value;
+  if(today == undefined){
+    var d = new Date();
+    setPageDate(d);
+    window.lat = position.coords.latitude;
+    window.lng = position.coords.longitude;
+    var today = d.getDay();
+
+  }else{
+
+//when the select box triggers a map update
+//position.coords is undefined here
+//need to keep position global or something. or separate the initialize map into it's own function
+//separate from updateMap
+
+
+  }
+
+
+  //we don't actually have to pull all the venues again, but we might to make it easier on me
   //date actually doesn't need to be calculated here, it can be returned from the Controller
-  var d = new Date();
-  console.log(this.value);
-  console.log(d);
-  d.setDate(d.getDate()+Number(this.value));
-  console.log(d);
-  setPageDate(d);
+  //but we don't even need an actual date, just day of week
+
+
+    //We use open street map.org here because Google's JSON is a mess. We'll switch back to Google when they wisen up
+    //var googleLookup = "http://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng+"&sensor=true";
+    var openStreetMapLookup = "http://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon="+lng;
+
+    $.getJSON( openStreetMapLookup , function( data ) {
+      //find zipcode in JSON response
+      var userZipcode = data.address.postcode;
+
+      $.ajax({
+        method: "POST",
+        url: "/venues",
+        data: {
+          userZipcode: userZipcode,
+          userLat: lat,
+          userLng: lng,
+          radius: 1.5,
+          day: today
+        }
+      }).done(function(data) {
+        initialize(lat,lng,$.parseJSON(data));
+        console.log(data);
+      });
+
+
+    });
+
+
 }
 
 function error(msg) {
