@@ -1,0 +1,9 @@
+get_venues.content:
+  path: /venues
+  defaults:
+    _controller: '\Drupal\get_venues\Controller\GetVenuesController::content'
+    _title: 'Get Venues'
+  methods:  [GET, POST]  
+  requirements:
+    _permission: 'access content'
+        

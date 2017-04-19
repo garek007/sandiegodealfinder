@@ -1,0 +1,6 @@
+name: Get Venues
+dependencies: {  }
+description: 'A custom module to get nearby venues'
+core: 8.x
+package: Custom
+type: module

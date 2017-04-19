@@ -55,6 +55,7 @@ function initialize(lat, lng, venue) {
     title: "You are Here.",
     icon:greenMarker,
     street:"",
+    phone:"",
     deal:""
   });
   for(i=-1;i<venue.length;i++){
@@ -67,6 +68,7 @@ function initialize(lat, lng, venue) {
         animation: google.maps.Animation.DROP,
         id: i,
         street: venue[i].street,
+        phone: venue[i].phone,
         deal: venue[i].dealsum
       })
     }
@@ -91,7 +93,7 @@ function initialize(lat, lng, venue) {
 function populateInfoWindow(marker, infowindow){
   if(infowindow.marker != marker){
     infowindow.marker = marker;
-    infowindow.setContent('<div><strong>'+ marker.title + '</strong><br>'+ marker.street +'<br><br>'+marker.deal+'</div>');
+    infowindow.setContent('<div><strong>'+ marker.title + '</strong><br>'+ marker.street +'<br>'+marker.phone+'<br>'+marker.deal+'</div>');
     infowindow.open(map,marker);
     infowindow.addListener('closeclick',function(){
       infowindow.setMarker(null);
